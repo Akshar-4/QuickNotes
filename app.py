@@ -5,7 +5,6 @@ from datetime import datetime
 import io
 import random
 
-# Set page configuration
 st.set_page_config(
     page_title="Axinity QuickNotes",
     page_icon="📝",
@@ -13,11 +12,10 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# API configuration
+
 API_KEY = "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"
 API_URL = "https://openrouter.ai/api/v1/chat/completions"
 
-# Compact Custom CSS
 st.markdown("""
 <style>
     /* Main container styling - COMPACT */
@@ -302,7 +300,7 @@ st.markdown("""
         font-weight: 700;
     }
     
-    /* Quiz question styling - COMPACT */
+   
     .quiz-question {
         background: white;
         padding: 1rem;
@@ -373,7 +371,6 @@ st.markdown("""
         font-size: 1rem;
     }
     
-    /* Score display - COMPACT */
     .score-display {
         text-align: center;
         padding: 1.5rem;
@@ -397,7 +394,7 @@ st.markdown("""
         font-weight: 600;
     }
     
-    /* Status indicators - COMPACT */
+ 
     .success-box {
         background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
         color: #155724;
@@ -431,7 +428,7 @@ st.markdown("""
         font-size: 0.95rem;
     }
     
-    /* Text stats - COMPACT */
+   
     .text-stats {
         background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
         border-radius: 10px;
@@ -468,7 +465,7 @@ st.markdown("""
         font-weight: 600;
     }
     
-    /* Feature cards - COMPACT */
+
     .feature-card {
         background: white;
         padding: 1.2rem;
@@ -520,20 +517,20 @@ st.markdown("""
         margin-bottom: 0.5rem !important;
     }
     
-    /* Reduce spacing between elements */
+  
     .block-container {
         padding-top: 1rem !important;
         padding-bottom: 1rem !important;
     }
     
-    /* Compact columns */
+
     .stColumn {
         padding: 0 5px !important;
     }
 </style>
 """, unsafe_allow_html=True)
 
-# Initialize session state
+
 if 'results' not in st.session_state:
     st.session_state.results = {
         'summary': '',
@@ -557,7 +554,6 @@ if 'active_tab' not in st.session_state:
 if 'num_questions' not in st.session_state:
     st.session_state.num_questions = 5
 
-# Initialize analysis options in session state
 if 'summary_selected' not in st.session_state:
     st.session_state.summary_selected = False
 if 'action_selected' not in st.session_state:
@@ -565,7 +561,7 @@ if 'action_selected' not in st.session_state:
 if 'quiz_selected' not in st.session_state:
     st.session_state.quiz_selected = False
 
-# App header with gradient
+
 st.markdown("""
 <div class="main-header">
     <h1>📝 Axinity QuickNotes</h1>
@@ -573,7 +569,7 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# **GETTING STARTED GUIDE AT THE TOP**
+
 st.markdown("""
 <div class='info-box'>
     <h4 style="margin-top: 0;">🚀 Getting Started</h4>
@@ -587,16 +583,13 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# **REMOVED THE 3 FEATURE CARDS SECTION**
-
-# **CENTER-ALIGNED BUTTONS**
 st.markdown("### 📋 Choose Input Method")
 
-# Create centered buttons with empty columns on sides
+
 col1, col2, col3 = st.columns([1, 2, 1])
 
 with col2:
-    # Create two columns within the center column
+
     btn_col1, btn_col2 = st.columns(2)
     
     with btn_col1:
@@ -621,7 +614,7 @@ with col2:
             st.session_state.active_tab = 'upload'
             st.rerun()
 
-# Content based on active tab - COMPACT
+
 if st.session_state.active_tab == 'paste':
     text_input = st.text_area(
         "**Enter or paste your text here:**",
@@ -635,7 +628,7 @@ if st.session_state.active_tab == 'paste':
         st.session_state.text_source = 'manual'
         st.session_state.uploaded_text = text_input
         
-        # Show text statistics
+
         words = len(text_input.split())
         chars = len(text_input)
         
@@ -652,7 +645,7 @@ if st.session_state.active_tab == 'paste':
         </div>
         """, unsafe_allow_html=True)
 
-else:  # upload tab
+else:  
     st.markdown("""
     <div class="upload-section" onclick="document.getElementById('file-uploader').click()">
         <h4 style="color: #667eea; margin: 0 0 5px 0;">📁 Upload Your Document</h4>
@@ -799,7 +792,7 @@ with col1:
     </div>
     """, unsafe_allow_html=True)
 
-# Action Items Card
+
 with col2:
     action_checkbox = st.checkbox(
         "Enable Action Items", 
@@ -849,7 +842,7 @@ with col3:
     </div>
     """, unsafe_allow_html=True)
 
-# Quiz settings (only show if quiz is selected)
+
 if st.session_state.quiz_selected:
     st.markdown("---")
     st.markdown("""
@@ -1300,4 +1293,5 @@ st.markdown("""
 <div class="footer">
     <p>✨ <strong>Axinity QuickNotes</strong> • AI-Powered Document Intelligence</p>
 </div>
+
 """, unsafe_allow_html=True)
