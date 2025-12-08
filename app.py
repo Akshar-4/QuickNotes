@@ -4,6 +4,7 @@ import json
 from datetime import datetime
 import io
 import random
+import PyPDF2
 
 st.set_page_config(
     page_title="Axinity QuickNotes",
@@ -1295,3 +1296,4 @@ st.markdown("""
 </div>
 
 """, unsafe_allow_html=True)
+
