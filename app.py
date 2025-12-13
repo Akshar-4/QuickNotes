@@ -5,6 +5,7 @@ from datetime import datetime
 import io
 import random
 import PyPDF2
+import os
 
 st.set_page_config(
     page_title="Axinity QuickNotes",
@@ -13,8 +14,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-
-API_KEY = "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"
+API_KEY = os.getenv("OPENROUTER_API_KEY")
 API_URL = "https://openrouter.ai/api/v1/chat/completions"
 
 st.markdown("""
@@ -1296,4 +1296,5 @@ st.markdown("""
 </div>
 
 """, unsafe_allow_html=True)
+
 
