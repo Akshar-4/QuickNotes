@@ -528,6 +528,17 @@ st.markdown("""
     .stColumn {
         padding: 0 5px !important;
     }
+    
+    /* Debug panel styling */
+    .debug-panel {
+        background: #f8f9fa;
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        padding: 1rem;
+        margin: 1rem 0;
+        font-family: monospace;
+        font-size: 0.9rem;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -562,6 +573,9 @@ if 'action_selected' not in st.session_state:
 if 'quiz_selected' not in st.session_state:
     st.session_state.quiz_selected = False
 
+# Debug mode toggle
+if 'debug_mode' not in st.session_state:
+    st.session_state.debug_mode = True  # Set to True to show debug info
 
 st.markdown("""
 <div class="main-header">
@@ -569,6 +583,70 @@ st.markdown("""
     <p>Transform text and documents into actionable insights with AI-powered analysis</p>
 </div>
 """, unsafe_allow_html=True)
+
+# Show API debug info at the top if debug mode is on
+if st.session_state.debug_mode:
+    with st.expander("🔍 API Debug Information (Click to show/hide)"):
+        st.markdown("<div class='debug-panel'>", unsafe_allow_html=True)
+        st.write("### API Configuration")
+        st.write(f"**API Key loaded:** {'Yes' if API_KEY else 'No'}")
+        if API_KEY:
+            st.write(f"**API Key (first 8 chars):** {API_KEY[:8]}...")
+        else:
+            st.write("⚠️ **API Key is not set!**")
+            st.write("Make sure you've set the OPENROUTER_API_KEY environment variable.")
+        
+        st.write(f"**Primary API URL:** {API_URL}")
+        
+        # Test API endpoint connectivity
+        st.write("### API Connection Test")
+        test_button = st.button("Test API Connection")
+        if test_button:
+            with st.spinner("Testing API connection..."):
+                headers = {
+                    "Authorization": f"Bearer {API_KEY}",
+                    "Content-Type": "application/json",
+                    "HTTP-Referer": "https://axinity-quicknotes.streamlit.app",
+                    "X-Title": "Axinity QuickNotes"
+                }
+                
+                # Test the API endpoint
+                try:
+                    response = requests.post(
+                        API_URL,
+                        headers=headers,
+                        json={
+                            "model": "tngtech/deepseek-r1t2-chimera:free",
+                            "messages": [
+                                {
+                                    "role": "user",
+                                    "content": "Test connection - please respond with 'API is working'"
+                                }
+                            ],
+                            "max_tokens": 20
+                        },
+                        timeout=10
+                    )
+                    st.write(f"**API test:** Status {response.status_code}")
+                    if response.status_code == 200:
+                        result = response.json()
+                        if 'choices' in result and result['choices']:
+                            content = result['choices'][0]['message']['content']
+                            st.success(f"✅ Connection successful! Response: {content}")
+                        else:
+                            st.success("✅ Connection successful (no content in response)")
+                    elif response.status_code == 401:
+                        st.error("❌ 401 Error: Unauthorized (check API key)")
+                    elif response.status_code == 404:
+                        st.error("❌ 404 Error: Endpoint not found")
+                    else:
+                        st.warning(f"⚠️ Unexpected status: {response.status_code}")
+                        if response.text:
+                            st.write(f"Response: {response.text[:200]}")
+                except Exception as e:
+                    st.error(f"❌ Connection failed: {str(e)}")
+        
+        st.markdown("</div>", unsafe_allow_html=True)
 
 
 st.markdown("""
@@ -916,15 +994,17 @@ with col1:
             st.markdown("<div class='warning-box'>🔘 Please select at least one analysis option</div>", unsafe_allow_html=True)
         else:
             with st.spinner("🤖 AI is analyzing your content..."):
-                # Function to call OpenRouter API
-                def call_openrouter_api(prompt):
+                # Function to call OpenRouter API with correct format
+                def call_openrouter_api(prompt, model="tngtech/deepseek-r1t2-chimera:free"):
                     headers = {
                         "Authorization": f"Bearer {API_KEY}",
                         "Content-Type": "application/json",
+                        "HTTP-Referer": "https://axinity-quicknotes.streamlit.app",
+                        "X-Title": "Axinity QuickNotes"
                     }
                     
                     data = {
-                        "model": "x-ai/grok-4.1-fast:free",
+                        "model": model,
                         "messages": [{"role": "user", "content": prompt}],
                         "max_tokens": 2000,
                         "temperature": 0.3
@@ -932,11 +1012,15 @@ with col1:
                     
                     try:
                         response = requests.post(API_URL, headers=headers, json=data, timeout=60)
+                        
                         if response.status_code == 200:
                             result = response.json()
                             if 'choices' in result and result['choices']:
                                 return result['choices'][0]['message']['content']
-                        return f"API Error {response.status_code}"
+                            else:
+                                return f"API Error: No choices in response. Full response: {result}"
+                        else:
+                            return f"API Error {response.status_code}: {response.text[:200]}"
                     except Exception as e:
                         return f"Connection error: {str(e)}"
                 
@@ -1296,5 +1380,3 @@ st.markdown("""
 </div>
 
 """, unsafe_allow_html=True)
-
-
